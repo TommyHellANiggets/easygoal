@@ -1,0 +1,513 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои задачи - EasyGoal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.tailwindcss.com/3.4.4"></script>
+    <link href="{% static 'styles.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'alimate-bg.css' %}">
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+</head>
+<body>
+    <header class="bg-custom-header">
+        <div class="flex items-center justify-between h-16  w-full"> <!-- Добавляем отступы -->
+            <div class="logo-container text-2xl font-semibold ml-5"> <!-- Добавляем отступ слева -->
+                <a href="{% url 'index' %}">EasyGoal</a>
+            </div>
+            <div class="flex items-center bg-custom-outline rounded-lg overflow-hidden search-container">
+                <input type="text" id="searchInput" class="bg-custom-searchbar text-custom-text w-full h-10 px-4 py-2 border-none placeholder-custom-placeholder focus:outline-none" placeholder="Введите запрос">
+                <button type="button" class="w-10 h-10 flex items-center justify-center text-custom-icon hover:text-custom-icon-hover">
+                    <img src="{% static 'img/search.svg' %}" alt="Поиск">
+                </button>
+            </div>
+            <button class="text-custom-icon hover:text-custom-icon-hover focus:outline-none burger-menu mr-5" id="openSidebarBtn"> <!-- Добавляем отступ справа -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.5 10.5H1.5C0.671578 10.5 0 11.1716 0 12C0 12.8284 0.671578 13.5 1.5 13.5H22.5C23.3284 13.5 24 12.8284 24 12C24 11.1716 23.3284 10.5 22.5 10.5Z" fill="currentColor"/>
+                    <path d="M1.5 6.50002H22.5C23.3284 6.50002 24 5.82844 24 5.00002C24 4.17159 23.3284 3.50002 22.5 3.50002H1.5C0.671578 3.50002 0 4.17159 0 5.00002C0 5.82844 0.671578 6.50002 1.5 6.50002Z" fill="currentColor"/>
+                    <path d="M22.5 17.5H1.5C0.671578 17.5 0 18.1716 0 19C0 19.8284 0.671578 20.5 1.5 20.5H22.5C23.3284 20.5 24 19.8284 24 19C24 18.1716 23.3284 17.5 22.5 17.5Z" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+    
+    <div id="overlay" class="overlay"></div>
+
+    <div id="sidebar" class="sidebar">
+        <button id="closeSidebarBtn" class="close-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.5 10.5H1.5C0.671578 10.5 0 11.1716 0 12C0 12.8284 0.671578 13.5 1.5 13.5H22.5C23.3284 13.5 24 12.8284 24 12C24 11.1716 23.3284 10.5 22.5 10.5Z" fill="currentColor"/>
+                <path d="M1.5 6.50002H22.5C23.3284 6.50002 24 5.82844 24 5.00002C24 4.17159 23.3284 3.50002 22.5 3.50002H1.5C0.671578 3.50002 0 4.17159 0 5.00002C0 5.82844 0.671578 6.50002 1.5 6.50002Z" fill="currentColor"/>
+                <path d="M22.5 17.5H1.5C0.671578 17.5 0 18.1716 0 19C0 19.8284 0.671578 20.5 1.5 20.5H22.5C23.3284 20.5 24 19.8284 24 19C24 18.1716 23.3284 17.5 22.5 17.5Z" fill="currentColor"/>
+            </svg>
+        </button>
+        <div class="profile-and-menu">
+            <ul class="task-list">
+                <li><!-- Ссылка на профиль -->
+                    <a href="#" class="profile-link">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        <span>Профиль</span>
+                    </a>
+                </li>
+                <hr class="divider">
+                <li><a href="#">Все задачи</a></li>
+                <li><a href="#">Дела по дому</a></li>
+                <li><a href="#">Работа</a></li>
+                <li><a href="#">Бизнес</a></li>
+                <li><a href="#">Развлечения</a></li>
+                <li><a href="#">Прочее</a></li>
+                <hr class="divider">
+            </ul>
+        </div>
+        
+        <div id="themeSwitcher" class="theme-switcher">
+            <button id="toggleThemeBtn" class="theme-btn">
+                <img src="img/sun.svg" alt="Светлый режим">
+            </button>
+            <button id="settingsBtn" class="settings-btn">
+                <img src="{% static 'img/settings.svg' %}" alt="Настройки">
+            </button>
+        </div>
+    </div>
+    <main class="bg-custom-main p-6">
+        <div class="custom-container section">
+            <div class="mb-6 w-full">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl sm:text-4xl font-semibold text-custom-text">Полезные советы</h2>
+                    <button class="text-custom-icon hover:text-custom-icon-hover focus:outline-none close-btn-baner">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18.828 16L24 10.8227C24.3358 10.441 24.5136 9.94583 24.4974 9.43774C24.4812 8.92965 24.2721 8.4468 23.9127 8.08735C23.5532 7.72789 23.0703 7.5188 22.5623 7.50258C22.0542 7.48636 21.559 7.66422 21.1773 8.00001L16 13.172L10.8133 7.98401C10.6275 7.79824 10.407 7.65087 10.1643 7.55033C9.92153 7.44979 9.66137 7.39804 9.39865 7.39804C9.13592 7.39804 8.87576 7.44979 8.63304 7.55033C8.39031 7.65087 8.16976 7.79824 7.98398 7.98401C7.7982 8.16979 7.65084 8.39034 7.5503 8.63307C7.44975 8.8758 7.39801 9.13595 7.39801 9.39868C7.39801 9.66141 7.44975 9.92156 7.5503 10.1643C7.65084 10.407 7.7982 10.6276 7.98398 10.8133L13.172 16L7.99998 21.176C7.79714 21.3573 7.63343 21.5781 7.51887 21.8249C7.4043 22.0717 7.34128 22.3392 7.33367 22.6112C7.32606 22.8831 7.37401 23.1538 7.4746 23.4066C7.57519 23.6593 7.72629 23.8889 7.91867 24.0813C8.11105 24.2737 8.34066 24.4248 8.59344 24.5254C8.84623 24.626 9.11688 24.6739 9.38884 24.6663C9.66079 24.6587 9.92834 24.5957 10.1751 24.4811C10.4219 24.3666 10.6427 24.2029 10.824 24L16 18.828L21.1706 24C21.5458 24.3752 22.0547 24.586 22.5853 24.586C23.1159 24.586 23.6248 24.3752 24 24C24.3752 23.6248 24.586 23.116 24.586 22.5853C24.586 22.0547 24.3752 21.5459 24 21.1707L18.828 16Z" fill="currentColor"/>
+                          </svg>
+                    </button>
+                </div>
+                <div class="flex flex-wrap gap-12 justify-center custom-boxes">
+                    <div class="custom-box text-white" style="background-color: var(--color-box1);"> 
+                        <span class="close-btn"><img src="{% static 'img/krest.svg' %}" alt="Не показывать"></span>
+                        <p>Добавьте свою первую задачу</p>
+                    </div>
+                    <div class="custom-box text-white" style="background-color: var(--color-box2);">
+                        <span class="close-btn"><img src="{% static 'img/krest.svg' %}" alt="Не показывать"></span>
+                        <p>Войдите в аккаунт для синхронизации данных</p>
+                    </div>
+                    <div class="custom-box text-white" style="background-color: var(--color-box3);">
+                        <span class="close-btn"><img src="{% static 'img/krest.svg' %}" alt="Не показывать"></span>
+                        <p>Добавьте свою первую задачу</p>
+                    </div>
+                    <div class="custom-box text-white" style="background-color: var(--color-box4);">
+                        <span class="close-btn"><img src="{% static 'img/krest.svg' %}" alt="Не показывать"></span>
+                        <p>Войдите в аккаунт для синхронизации данных</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="categories-container section">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl sm:text-4xl font-semibold text-custom-text">Категории</h2>
+                <button class="text-custom-icon hover:text-custom-icon-hover focus:outline-none close-btn-baner">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.828 16L24 10.8227C24.3358 10.441 24.5136 9.94583 24.4974 9.43774C24.4812 8.92965 24.2721 8.4468 23.9127 8.08735C23.5532 7.72789 23.0703 7.5188 22.5623 7.50258C22.0542 7.48636 21.559 7.66422 21.1773 8.00001L16 13.172L10.8133 7.98401C10.6275 7.79824 10.407 7.65087 10.1643 7.55033C9.92153 7.44979 9.66137 7.39804 9.39865 7.39804C9.13592 7.39804 8.87576 7.44979 8.63304 7.55033C8.39031 7.65087 8.16976 7.79824 7.98398 7.98401C7.7982 8.16979 7.65084 8.39034 7.5503 8.63307C7.44975 8.8758 7.39801 9.13595 7.39801 9.39868C7.39801 9.66141 7.44975 9.92156 7.5503 10.1643C7.65084 10.407 7.7982 10.6276 7.98398 10.8133L13.172 16L7.99998 21.176C7.79714 21.3573 7.63343 21.5781 7.51887 21.8249C7.4043 22.0717 7.34128 22.3392 7.33367 22.6112C7.32606 22.8831 7.37401 23.1538 7.4746 23.4066C7.57519 23.6593 7.72629 23.8889 7.91867 24.0813C8.11105 24.2737 8.34066 24.4248 8.59344 24.5254C8.84623 24.626 9.11688 24.6739 9.38884 24.6663C9.66079 24.6587 9.92834 24.5957 10.1751 24.4811C10.4219 24.3666 10.6427 24.2029 10.824 24L16 18.828L21.1706 24C21.5458 24.3752 22.0547 24.586 22.5853 24.586C23.1159 24.586 23.6248 24.3752 24 24C24.3752 23.6248 24.586 23.116 24.586 22.5853C24.586 22.0547 24.3752 21.5459 24 21.1707L18.828 16Z" fill="currentColor"/>
+                      </svg>
+                </button>
+            </div>
+            <div class="categories">
+                <div class="category-add">Добавить категорию</div>
+                <div class="category-text-add">
+                    <input type="text" placeholder="Введите название" id="category-input">
+                    <button id="save-category">Сохранить</button>
+                </div>
+                {% for category in categories %}
+                    <div class="category-box" data-index="{{ forloop.counter }}">
+                        {{ category.name }}
+                    </div>
+                {% empty %}
+                    <p>No categories available.</p>
+                {% endfor %}
+
+                <!-- Add more categories as needed -->
+            </div>
+        </div>
+        <div class="tasks-container-wrapper section">
+            <div class="tasks-container">
+                <div class="tasks-header">
+                    <button class="text-custom-icon hover:text-custom-icon-hover focus:outline-none" style="border: none;">
+                        <!-- Иконка для сортировки -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="margin-right: 5px;">
+                            <path d="M12.707 17.707C13.098 18.098 13.098 18.73 12.707 19.121L8.41401 23.414C8.02401 23.804 7.51201 23.999 7.00001 23.999C6.48801 23.999 5.97601 23.804 5.58601 23.414L1.29301 19.121C0.902006 18.73 0.902006 18.098 1.29301 17.707C1.68401 17.316 2.31601 17.316 2.70701 17.707L6.00001 21V1C6.00001 0.447 6.44801 0 7.00001 0C7.55201 0 8.00001 0.447 8.00001 1V21L11.293 17.707C11.684 17.316 12.316 17.316 12.707 17.707ZM22.707 4.879L18.414 0.586C17.635 -0.193 16.365 -0.193 15.586 0.586L11.293 4.879C10.902 5.27 10.902 5.902 11.293 6.293C11.684 6.684 12.316 6.684 12.707 6.293L16 3V23C16 23.553 16.447 24 17 24C17.553 24 18 23.553 18 23V3L21.293 6.293C21.488 6.488 21.744 6.586 22 6.586C22.256 6.586 22.512 6.488 22.707 6.293C23.098 5.902 23.098 5.27 22.707 4.879Z" fill="currentColor"/>
+                        </svg>
+                        <span>Сортировать по</span>
+                    </button>
+                    <div>
+                        <div class="input-container">
+                            <form method="post" id="task-form">
+                                {% csrf_token %}
+                                <div class="form-row">
+                                    <!-- Поле для описания задачи -->
+                                    {{ form.description }}
+
+                                    <!-- Селект и инпут для даты/времени -->
+                                    <select id="category-select" name="category">
+                                        <option value="">Выберите категорию</option>
+                                        <!-- Динамически заполнится -->
+                                    </select>
+                                    <input type="datetime-local" id="datetime-input" name="due_date">
+
+                                    <!-- Кнопки действия -->
+                                    <div class="form-buttons">
+                                        <button type="submit">Сохранить</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <button id="add-task-button" class="text-custom-icon hover:text-custom-icon-hover focus:outline-none" type="button">
+                            <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg" style="margin-right: 5px;">
+                                <path d="M21.25 13.75H16.25V8.75C16.25 8.41848 16.1183 8.10054 15.8839 7.86612C15.6495 7.6317 15.3315 7.5 15 7.5C14.6685 7.5 14.3505 7.6317 14.1161 7.86612C13.8817 8.10054 13.75 8.41848 13.75 8.75V13.75H8.75C8.41848 13.75 8.10054 13.8817 7.86612 14.1161C7.6317 14.3505 7.5 14.6685 7.5 15C7.5 15.3315 7.6317 15.6495 7.86612 15.8839C8.10054 16.1183 8.41848 16.25 8.75 16.25H13.75V21.25C13.75 21.5815 13.8817 21.8995 14.1161 22.1339C14.3505 22.3683 14.6685 22.5 15 22.5C15.3315 22.5 15.6495 22.3683 15.8839 22.1339C16.1183 21.8995 16.25 21.5815 16.25 21.25V16.25H21.25C21.5815 16.25 21.8995 16.1183 22.1339 15.8839C22.3683 15.6495 22.5 15.3315 22.5 15C22.5 14.6685 22.3683 14.3505 22.1339 14.1161C21.8995 13.8817 21.5815 13.75 21.25 13.75Z" fill="currentColor"/>
+                            </svg>
+                            <span>Добавить задачу</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="tasksContainer">
+                    {% for task in tasks %}
+                    <div class="task-card animate__animated animate__fadeInUp">
+                        <div class="task-info">
+                            <div class="task-category">
+                                {{ task.category}}
+                            </div>
+                            <div class="task-title">
+                                {{ task.description }}
+                            </div>
+                        </div>
+                        <div class="task-due">
+                            {% if task.due_date %}
+                                {{ task.due_date|date:"d.m Y H:i" }}
+                            {% else %}
+                                Бессрочно
+                            {% endif %}
+                        </div>
+                        <div class="task-buttons">
+                            <button class="asap-btn">
+                                <svg width="30" height="30" viewBox="0 0 30 30" fill="currentColor" class="asap-svg" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M29.795 10.9925C29.5393 10.1786 29.0285 9.46864 28.3381 8.96754C27.6476 8.46645 26.8143 8.20084 25.9612 8.21H20.5L18.8412 3.04C18.5804 2.2262 18.0678 1.51627 17.3775 1.01259C16.6871 0.5089 15.8546 0.237488 15 0.237488C14.1454 0.237488 13.3129 0.5089 12.6225 1.01259C11.9322 1.51627 11.4196 2.2262 11.1587 3.04L9.5 8.21H4.03875C3.18843 8.21122 2.36024 8.48111 1.67247 8.98114C0.984707 9.48116 0.472548 10.1857 0.209149 10.9942C-0.0542504 11.8027 -0.0554163 12.6738 0.205818 13.483C0.467052 14.2922 0.977323 14.9981 1.66375 15.5L6.10875 18.75L4.41875 23.9838C4.14564 24.7955 4.14218 25.6738 4.40888 26.4876C4.67559 27.3015 5.19818 28.0073 5.89875 28.5C6.58731 29.0085 7.42174 29.2809 8.27769 29.2766C9.13364 29.2723 9.9653 28.9916 10.6487 28.4763L15 25.2738L19.3525 28.4725C20.0398 28.9781 20.8697 29.2527 21.723 29.2568C22.5762 29.261 23.4087 28.9945 24.101 28.4956C24.7932 27.9968 25.3094 27.2913 25.5754 26.4806C25.8413 25.6699 25.8434 24.7957 25.5812 23.9838L23.8912 18.75L28.3412 15.5C29.0355 15.0044 29.5518 14.2985 29.8136 13.4867C30.0754 12.6749 30.0689 11.8003 29.795 10.9925ZM26.8662 13.4813L21.6862 17.2675C21.4735 17.4227 21.3152 17.6412 21.2339 17.8917C21.1527 18.1422 21.1526 18.412 21.2337 18.6625L23.2025 24.75C23.3021 25.0588 23.3013 25.3912 23.2001 25.6994C23.0989 26.0076 22.9025 26.2759 22.6393 26.4655C22.376 26.6551 22.0594 26.7564 21.735 26.7547C21.4106 26.753 21.095 26.6486 20.8337 26.4563L15.74 22.7063C15.5255 22.5487 15.2662 22.4637 15 22.4637C14.7338 22.4637 14.4745 22.5487 14.26 22.7063L9.16625 26.4563C8.9051 26.6511 8.58867 26.7578 8.26283 26.7608C7.93699 26.7637 7.61867 26.6628 7.35403 26.4727C7.08939 26.2826 6.89218 26.0131 6.79099 25.7034C6.6898 25.3936 6.68989 25.0597 6.79125 24.75L8.76625 18.6625C8.84739 18.412 8.84733 18.1422 8.76607 17.8917C8.68482 17.6412 8.52651 17.4227 8.31375 17.2675L3.13375 13.4813C2.87288 13.2902 2.67904 13.0217 2.57992 12.7139C2.48081 12.4062 2.48148 12.075 2.58185 11.7676C2.68222 11.4603 2.87715 11.1925 3.1388 11.0026C3.40045 10.8126 3.71543 10.7102 4.03875 10.71H10.4137C10.6784 10.71 10.9362 10.626 11.1501 10.4701C11.3639 10.3142 11.5228 10.0945 11.6037 9.8425L13.5412 3.80375C13.6407 3.49474 13.8356 3.22524 14.098 3.03407C14.3604 2.84289 14.6766 2.73989 15.0012 2.73989C15.3259 2.73989 15.6421 2.84289 15.9045 3.03407C16.1669 3.22524 16.3618 3.49474 16.4612 3.80375L18.3987 9.8425C18.4797 10.0945 18.6386 10.3142 18.8524 10.4701C19.0663 10.626 19.3241 10.71 19.5887 10.71H25.9637C26.2871 10.7102 26.602 10.8126 26.8637 11.0026C27.1253 11.1925 27.3203 11.4603 27.4206 11.7676C27.521 12.075 27.5217 12.4062 27.4226 12.7139C27.3235 13.0217 27.1296 13.2902 26.8687 13.4813H26.8662Z" fill="currentColor"/>
+                                </svg>
+                            </button>
+                            <button>
+                                <img src="{% static 'img/complite.svg' %}" alt="Выполнено" class="h-6 w-6">
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="animation-container">
+            <div id="ball1"></div>
+            <div id="ball2"></div>
+            <div id="ball3"></div>
+            <div id="ball4"></div>
+        </div>
+    </footer>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Определение массива цветов
+            const colors = [
+                'category-box-1',
+                'category-box-2',
+                'category-box-3',
+                'category-box-4',
+                'category-box-5',
+                'category-box-6'
+            ];
+
+            // Получение всех элементов с классом 'category-box'
+            const categoryBoxes = document.querySelectorAll('.category-box');
+
+            categoryBoxes.forEach((box, index) => {
+                // Выбор цвета на основе индекса элемента
+                const colorClass = colors[index % colors.length];
+                box.classList.add(colorClass);
+            });
+        });
+    </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const tasksContainer = document.getElementById('tasksContainer');
+
+    function filterTasks() {
+        const query = searchInput.value.toLowerCase();
+
+        fetch(`/search_tasks?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                tasksContainer.innerHTML = '';
+                data.tasks.forEach(task => {
+                    const taskElement = document.createElement('div');
+                    taskElement.className = 'task-card animate__animated animate__fadeInUp';
+                    taskElement.innerHTML = `
+                        <div class="task-info">
+                            <div class="task-category">${task.category}</div>
+                            <div class="task-title">${task.description}</div>
+                        </div>
+                        <div class="task-due">${task.due_date ? new Date(task.due_date).toLocaleString('ru-RU') : 'Бессрочно'}</div>
+                        <div class="task-buttons">
+                            <button class="asap-btn">
+                                <!-- SVG icon here -->
+                            </button>
+                            <button>
+                                <img src="${task.complete_icon_url}" alt="Выполнено" class="h-6 w-6">
+                            </button>
+                        </div>
+                    `;
+                    tasksContainer.appendChild(taskElement);
+                });
+            });
+    }
+
+    searchInput.addEventListener('input', filterTasks);
+});
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const addTaskButton = document.getElementById('add-task-button');
+    const inputContainer = document.querySelector('.input-container');
+
+    // Явно скрываем контейнер при загрузке страницы
+    inputContainer.style.display = 'none';
+
+    addTaskButton.addEventListener('click', () => {
+        if (inputContainer.style.display === 'none' || inputContainer.style.display === '') {
+            inputContainer.style.display = 'block';
+        } else {
+            inputContainer.style.display = 'none';
+        }
+    });
+});
+</script>
+
+
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/categories/')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('category-select');
+                    data.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.name;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Ошибка:', error));
+        });
+    </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const categoryBox = document.querySelector('.category-add');
+        const categoryTextAdd = document.querySelector('.category-text-add');
+        const saveButton = document.getElementById('save-category');
+        const categoryInput = document.getElementById('category-input');
+
+        let isVisible = false;
+
+        categoryBox.addEventListener('click', function() {
+            if (isVisible) {
+                categoryTextAdd.classList.remove('show');
+                categoryTextAdd.classList.add('hide');
+            } else {
+                categoryTextAdd.classList.remove('hide');
+                categoryTextAdd.classList.add('show');
+            }
+            isVisible = !isVisible;
+        });
+
+        saveButton.addEventListener('click', function() {
+            const categoryName = categoryInput.value.trim();
+            if (categoryName) {
+                fetch('/add-category/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken') // CSRF token for security
+                    },
+                    body: JSON.stringify({ name: categoryName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        categoryTextAdd.classList.remove('show');
+                        categoryTextAdd.classList.add('hide');
+                        categoryInput.value = '';
+                        isVisible = false; // Update visibility status
+                    } else {
+                        alert('Error adding category');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+            const addButton = document.getElementById('add-task-button');
+            const taskInputContainer = document.getElementById('task-input-container');
+            const cancelButton = document.getElementById('cancel-button');
+            const taskForm = document.getElementById('task-form');
+            let isExpanded = false;
+
+            addButton.addEventListener('click', () => {
+                if (isExpanded) {
+                    // Скрыть контейнер с формой
+                    taskInputContainer.style.display = 'none';
+                } else {
+                    // Показать контейнер с формой
+                    taskInputContainer.style.display = 'block';
+                }
+                isExpanded = !isExpanded;
+            });
+
+            cancelButton.addEventListener('click', () => {
+                // Скрыть контейнер с формой и очистить поля
+                taskInputContainer.style.display = 'none';
+                taskForm.reset();
+                isExpanded = false;
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitcher = document.getElementById('toggleThemeBtn');
+            const themeIcon = themeSwitcher.querySelector('img');
+            const settingsButton = document.getElementById('settingsBtn');
+        
+            // Функция для применения сохраненной темы
+            function applySavedTheme() {
+                let currentTheme = localStorage.getItem('theme') || 'dark';
+                if (currentTheme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    themeIcon.src = "{% static 'img/sun.svg' %}"; // Иконка для светлого режима
+                } else {
+                    document.body.classList.add('light-mode');
+                    themeIcon.src = "{% static 'img/moon.svg' %}"; // Иконка для темного режима
+                }
+            }
+        
+            // Применяем сохраненную тему при загрузке страницы
+            applySavedTheme();
+        
+            themeSwitcher.addEventListener('click', () => {
+                let currentTheme = localStorage.getItem('theme') || 'dark';
+                if (currentTheme === 'dark') {
+                    document.body.classList.remove('dark-mode');
+                    document.body.classList.add('light-mode');
+                    themeIcon.src = "{% static 'img/moon.svg' %}"; // Иконка для темного режима
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.body.classList.remove('light-mode');
+                    document.body.classList.add('dark-mode');
+                    themeIcon.src = "{% static 'img/sun.svg' %}"; // Иконка для светлого режима
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        
+            // Обработчик для кнопки настроек (пока пустой, добавьте функционал при необходимости)
+            settingsButton.addEventListener('click', () => {
+                // Добавьте код для обработки открытия настроек
+                alert('Настройки');
+            });
+        });
+        
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const container = document.querySelector('.animation-container');
+            const balls = document.querySelectorAll('.animation-container div');
+
+            const ballData = [];
+
+            balls.forEach((ball) => {
+                const rect = ball.getBoundingClientRect();
+                const randomDirection = Math.random() * 2 * Math.PI; // Случайный угол
+                const speed = 1.5 + Math.random() * 2; // Случайная скорость
+
+                ballData.push({
+                    element: ball,
+                    x: Math.random() * (window.innerWidth - rect.width),
+                    y: Math.random() * (window.innerHeight - rect.height),
+                    dx: Math.cos(randomDirection) * speed,
+                    dy: Math.sin(randomDirection) * speed
+                });
+            });
+
+            function update() {
+                ballData.forEach(data => {
+                    const rect = data.element.getBoundingClientRect();
+
+                    // Проверка столкновений с краями экрана
+                    if (data.x + rect.width > window.innerWidth || data.x < 0) {
+                        data.dx *= -1; // Отскок по горизонтали
+                        data.dx += (Math.random() - 0.5) * 0.5; // Случайное изменение направления
+                    }
+                    if (data.y + rect.height > window.innerHeight || data.y < 0) {
+                        data.dy *= -1; // Отскок по вертикали
+                        data.dy += (Math.random() - 0.5) * 0.5; // Случайное изменение направления
+                    }
+
+                    data.x += data.dx;
+                    data.y += data.dy;
+
+                    data.element.style.transform = `translate(${data.x}px, ${data.y}px)`;
+                });
+
+                requestAnimationFrame(update);
+            }
+
+            update();
+        });
+        
+    </script>
+    <script>
+        document.getElementById('openSidebarBtn').addEventListener('click', function () {
+            document.getElementById('sidebar').style.width = '280px';
+            document.getElementById('overlay').style.display = 'block';
+        });
+        
+        document.getElementById('closeSidebarBtn').addEventListener('click', function () {
+            document.getElementById('sidebar').style.width = '0';
+            document.getElementById('overlay').style.display = 'none';
+        });
+        
+        document.getElementById('overlay').addEventListener('click', function () {
+            document.getElementById('sidebar').style.width = '0';
+            document.getElementById('overlay').style.display = 'none';
+        });
+        
+    </script>
+    
+</body>
+</html>
